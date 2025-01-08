@@ -6,6 +6,8 @@ import {
   Select,
   MenuItem,
   ListItemIcon,
+  TextField,
+  Checkbox,
 } from "@mui/material";
 import styled from "styled-components";
 import FInput from "./Input";
@@ -28,6 +30,103 @@ const FormQuestion = () => {
     "옵션 추가 또는 '기타' 추가",
   ]);
 
+  const handleTypeChange = (event) => {
+    setQuestionType(event.target.value);
+  };
+
+  const renderOptionsByType = () => {
+    switch (questionType) {
+      case "객관식 질문":
+        return (
+          <OptionsContainer>
+            {options.map((option, index) => (
+              <OptionRow key={index}>
+                <Radio disabled />
+                <FInput
+                  value={option}
+                  sx={{
+                    width: "100%",
+                    "& .MuiInputBase-input": {
+                      padding: "8px 0",
+                    },
+                  }}
+                />
+              </OptionRow>
+            ))}
+          </OptionsContainer>
+        );
+
+      case "체크박스":
+        return (
+          <OptionsContainer>
+            {options.map((option, index) => (
+              <OptionRow key={index}>
+                <Checkbox disabled />
+                <FInput
+                  value={option}
+                  sx={{
+                    width: "100%",
+                    "& .MuiInputBase-input": {
+                      padding: "8px 0",
+                    },
+                  }}
+                />
+              </OptionRow>
+            ))}
+          </OptionsContainer>
+        );
+
+      case "단답형":
+        return (
+          <ShortAnswerContainer>
+            <TextField
+              disabled
+              fullWidth
+              variant="standard"
+              placeholder="단답형 텍스트"
+            />
+          </ShortAnswerContainer>
+        );
+
+      case "장문형":
+        return (
+          <LongAnswerContainer>
+            <TextField
+              disabled
+              fullWidth
+              multiline
+              rows={4}
+              variant="standard"
+              placeholder="장문형 텍스트"
+            />
+          </LongAnswerContainer>
+        );
+
+      case "드롭다운":
+        return (
+          <OptionsContainer>
+            {options.map((option, index) => (
+              <OptionRow key={index}>
+                <OptionNumber>{index + 1}.</OptionNumber>
+                <FInput
+                  value={option}
+                  sx={{
+                    width: "100%",
+                    "& .MuiInputBase-input": {
+                      padding: "8px 0",
+                    },
+                  }}
+                />
+              </OptionRow>
+            ))}
+          </OptionsContainer>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <Container>
       <ColorBar />
@@ -39,7 +138,11 @@ const FormQuestion = () => {
         />
         {/* fixme: 아이콘을 포함한 컴포안트 컴포넌트로 분리 고려. */}
         <RightSection>
-          <StyledSelect value={questionType} size="small">
+          <StyledSelect
+            value={questionType}
+            size="small"
+            onChange={handleTypeChange}
+          >
             <MenuItem value="객관식 질문">
               <ListItemIcon>
                 <RadioButtonCheckedIcon fontSize="small" />
@@ -73,24 +176,7 @@ const FormQuestion = () => {
           </StyledSelect>
         </RightSection>
       </QuestionHeader>
-
-      <OptionsContainer>
-        {options.map((option, index) => (
-          <OptionRow key={index}>
-            <Radio />
-            <FInput
-              value={option}
-              sx={{
-                width: "100%",
-                "& .MuiInputBase-input": {
-                  padding: "8px 0",
-                },
-              }}
-            />
-          </OptionRow>
-        ))}
-      </OptionsContainer>
-
+      {renderOptionsByType()}
       <BottomToolbar>
         <ToolbarLeft>
           <IconButton>
@@ -168,6 +254,24 @@ const OptionRow = styled.div`
   display: flex;
   align-items: center;
   margin: 8px 0;
+  gap: 8px;
+`;
+
+const ShortAnswerContainer = styled.div`
+  margin: 16px 0;
+  padding: 8px 0;
+  border-bottom: 1px dotted rgb(218, 220, 224);
+`;
+
+const LongAnswerContainer = styled.div`
+  margin: 16px 0;
+  padding: 8px 0;
+  border-bottom: 1px dotted rgb(218, 220, 224);
+`;
+
+const OptionNumber = styled.span`
+  color: rgba(0, 0, 0, 0.54);
+  margin-right: 8px;
 `;
 
 const BottomToolbar = styled.div`
