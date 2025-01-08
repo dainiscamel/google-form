@@ -1,9 +1,27 @@
 import { createBrowserRouter } from "react-router-dom";
-import GoogleForm from "@/pages/GoogleForm";
+import Layout from "./components/Layout";
+import MakeForm from "./pages/MakeFOrm";
+import PreviewForm from "./pages/PreviewForm";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <GoogleForm />,
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <MakeForm />,
+      },
+    ],
+  },
+  {
+    path: "/preview",
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <PreviewForm />,
+      },
+    ],
   },
 ]);
