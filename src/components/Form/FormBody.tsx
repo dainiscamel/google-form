@@ -1,26 +1,33 @@
-import { useState } from "react";
-import { SelectChangeEvent } from "@mui/material";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { SelectChangeEvent } from "@mui/material";
 import FormInput from "./Input";
 import FormSelect from "@/components/Form/FormSelect";
 import FormBottomToolbar from "./FormBottomToolbar";
 import FormOption from "@/components/Form/FormOption";
+import { RootState } from "@/store/store";
+import {
+  setQuestion,
+  setQuestionType,
+  toggleRequired,
+} from "@/store/formSlice";
 
 const FormBody = () => {
-  const [questionType, setQuestionType] = useState("객관식 질문");
-  const [question, setQuestion] = useState("");
-  const [required, setRequired] = useState(false);
+  const dispatch = useDispatch();
+  const { question, questionType, required } = useSelector(
+    (state: RootState) => state.form
+  );
 
-  const handleRequiredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRequired(e.target.checked);
+  const handleRequiredChange = () => {
+    dispatch(toggleRequired());
   };
 
   const handleTypeChange = (e: SelectChangeEvent<string>) => {
-    setQuestionType(e.target.value);
+    dispatch(setQuestionType(e.target.value));
   };
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuestion(e.target.value);
+    dispatch(setQuestion(e.target.value));
   };
 
   return (
@@ -56,7 +63,7 @@ const FormBody = () => {
 const Container = styled.div`
   border: 1px solid rgb(218, 220, 224);
   border-radius: 8px;
-  padding: 24px;
+  padding: 24px 24px 12px;
   background-color: white;
   position: relative;
   margin-bottom: 12px;

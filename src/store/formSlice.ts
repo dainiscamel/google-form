@@ -1,70 +1,100 @@
-// store/formSlice.ts
+import { FormState } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface Option {
-  id: string;
-  text: string;
-}
-
-interface Question {
-  id: string;
-  type: string;
-  title: string;
-  options: Option[];
-  required: boolean;
-}
-
-interface FormState {
-  title: string;
-  description: string;
-  questions: Question[];
-}
 
 const initialState: FormState = {
   title: "제목 없는 설문지",
   description: "설문지 설명",
-  questions: [],
+  questionType: "객관식 질문",
+  question: "",
+  options: [{ id: "1", text: "옵션 1" }],
+  hasOther: false,
+  required: false,
 };
 
 const formSlice = createSlice({
   name: "form",
   initialState,
   reducers: {
-    updateTitle: (state, action: PayloadAction<string>) => {
+    setTitle: (state, action: PayloadAction<string>) => {
       state.title = action.payload;
     },
-    updateDescription: (state, action: PayloadAction<string>) => {
+
+    setDescription: (state, action: PayloadAction<string>) => {
       state.description = action.payload;
     },
-    addQuestion: (state, action: PayloadAction<Question>) => {
-      state.questions.push(action.payload);
+
+    setQuestion: (state, action: PayloadAction<string>) => {
+      state.question = action.payload;
     },
-    updateQuestion: (
+
+    setQuestionType: (state, action: PayloadAction<string>) => {
+      state.questionType = action.payload;
+    },
+
+    addOption: (state) => {
+      const newOption = {
+        id: Date.now().toString(),
+        text: `옵션 ${state.options.filter((opt) => !opt.isOther).length + 1}`,
+      };
+      state.options = [
+        ...state.options.filter((opt) => !opt.isOther),
+        newOption,
+        ...state.options.filter((opt) => opt.isOther),
+      ];
+    },
+
+    addOther: (state) => {
+      if (!state.hasOther) {
+        state.options.push({
+          id: Date.now().toString(),
+          text: "기타...",
+          isOther: true,
+        });
+        state.hasOther = true;
+      }
+    },
+
+    deleteOption: (state, action: PayloadAction<string>) => {
+      if (state.options.length <= 1) return;
+
+      const option = state.options.find((opt) => opt.id === action.payload);
+      if (option?.isOther) {
+        state.hasOther = false;
+      }
+      state.options = state.options.filter((opt) => opt.id !== action.payload);
+    },
+
+    updateOptionText: (
       state,
-      action: PayloadAction<{ id: string; question: Partial<Question> }>
+      action: PayloadAction<{ id: string; text: string }>
     ) => {
-      const index = state.questions.findIndex(
-        (q) => q.id === action.payload.id
+      const optionIndex = state.options.findIndex(
+        (opt) => opt.id === action.payload.id
       );
-      if (index !== -1) {
-        state.questions[index] = {
-          ...state.questions[index],
-          ...action.payload.question,
+      if (optionIndex !== -1) {
+        state.options[optionIndex] = {
+          ...state.options[optionIndex],
+          text: action.payload.text,
         };
       }
     },
-    deleteQuestion: (state, action: PayloadAction<string>) => {
-      state.questions = state.questions.filter((q) => q.id !== action.payload);
+
+    toggleRequired: (state) => {
+      state.required = !state.required;
     },
   },
 });
 
 export const {
-  updateTitle,
-  updateDescription,
-  addQuestion,
-  updateQuestion,
-  deleteQuestion,
+  setTitle,
+  setDescription,
+  setQuestion,
+  setQuestionType,
+  addOption,
+  addOther,
+  deleteOption,
+  updateOptionText,
+  toggleRequired,
 } = formSlice.actions;
 
 export default formSlice.reducer;

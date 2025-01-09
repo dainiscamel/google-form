@@ -1,92 +1,79 @@
-// components/Form/FormOption/index.tsx
-import { Radio, IconButton } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { IconButton } from "@mui/material";
 import styled from "styled-components";
 import FormInput from "@/components/Form/Input";
+import FormOptionType from "@/components/Form/FormOptionType";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
-
-interface Option {
-  id: string;
-  text: string;
-  isOther?: boolean;
-}
+import {
+  addOption,
+  addOther,
+  deleteOption,
+  updateOptionText,
+} from "@/store/formSlice";
+import { Option } from "@/types";
+import { RootState } from "@/store/store";
 
 const FormOption = () => {
-  const [options, setOptions] = useState<Option[]>([
-    { id: "1", text: "옵션 1" },
-  ]);
-  const [hasOther, setHasOther] = useState(false);
+  const dispatch = useDispatch();
+  const { questionType, options, hasOther } = useSelector(
+    (state: RootState) => state.form
+  );
 
   const handleOptionChange = (id: string, value: string) => {
-    setOptions(
-      options.map((opt) => (opt.id === id ? { ...opt, text: value } : opt))
-    );
+    dispatch(updateOptionText({ id, text: value }));
   };
 
-  const handleAddOption = () => {
-    const newOption = {
-      id: Date.now().toString(),
-      text: `옵션 ${options.filter((opt) => !opt.isOther).length + 1}`,
-    };
-    setOptions([
-      ...options.filter((opt) => !opt.isOther),
-      newOption,
-      ...options.filter((opt) => opt.isOther),
-    ]);
-  };
-
-  const handleAddOther = () => {
+  const handleAddOptionOrOther = () => {
     if (!hasOther) {
-      const newOption = {
-        id: Date.now().toString(),
-        text: "기타...",
-        isOther: true,
-      };
-      setOptions([...options, newOption]);
-      setHasOther(true);
+      dispatch(addOther());
+    } else {
+      dispatch(addOption());
     }
-  };
-
-  const handleDeleteOption = (id: string) => {
-    const option = options.find((opt) => opt.id === id);
-    if (option?.isOther) {
-      setHasOther(false);
-    }
-    setOptions(options.filter((opt) => opt.id !== id));
   };
 
   return (
     <Container>
-      {options.map((option) => (
+      {options.map((option: Option, index: number) => (
         <OptionRow key={option.id}>
-          <Radio disabled />
+          <FormOptionType type={questionType} index={index} />
           <FormInput
             value={option.text}
             onChange={(e) => handleOptionChange(option.id, e.target.value)}
             placeholder={option.isOther ? "기타..." : ""}
-            disabled={option.isOther ? true : false}
+            disabled={option.isOther}
+            sx={{ width: "100%" }}
           />
-          <DeleteButton onClick={() => handleDeleteOption(option.id)}>
+          <DeleteButton onClick={() => dispatch(deleteOption(option.id))}>
             <CloseIcon fontSize="small" />
           </DeleteButton>
         </OptionRow>
       ))}
-      <OptionRow>
-        <Radio disabled />
-        <AddOptionButton onClick={handleAddOption}>옵션 추가</AddOptionButton>
-        {!hasOther && "또는"}
-        {!hasOther && (
-          <AddOptionButton onClick={handleAddOther}>
-            '기타' 추가
-          </AddOptionButton>
-        )}
-      </OptionRow>
+      {(questionType === "객관식 질문" ||
+        questionType === "체크박스" ||
+        questionType === "드롭다운") && (
+        <OptionRow>
+          <FormOptionType type={questionType} index={options.length} />
+          <AddOptionContainer>
+            <AddOptionButton onClick={() => dispatch(addOption())}>
+              옵션 추가
+            </AddOptionButton>
+            {!hasOther && (
+              <>
+                또는
+                <AddOptionButton onClick={handleAddOptionOrOther} isOther>
+                  '기타' 추가
+                </AddOptionButton>
+              </>
+            )}
+          </AddOptionContainer>
+        </OptionRow>
+      )}
     </Container>
   );
 };
 
 const Container = styled.div`
-  margin: 16px 0;
+  margin: 12px 0;
 `;
 
 const OptionRow = styled.div`
@@ -94,6 +81,12 @@ const OptionRow = styled.div`
   align-items: center;
   margin: 8px 0;
   gap: 4px;
+`;
+
+const AddOptionContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const AddOptionButton = styled.button<{ isOther?: boolean }>`

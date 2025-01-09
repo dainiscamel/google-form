@@ -39,8 +39,8 @@ const Toolbar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid rgb(218, 220, 224);
 `;
 
