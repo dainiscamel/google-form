@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./components/Layout";
-import MakeForm from "./pages/MakeFOrm";
-import PreviewForm from "./pages/PreviewForm";
+import MakeForm from "./pages/Form/MakeForm";
+import PreviewForm from "./pages/Preview/PreviewForm";
 
 export const router = createBrowserRouter([
   {
