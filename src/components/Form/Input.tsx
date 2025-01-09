@@ -1,7 +1,7 @@
-import { Theme } from "@emotion/react";
-import { styled, SxProps } from "@mui/material/styles";
+import { Input } from "@mui/material";
+import { SxProps } from "@mui/material/styles";
+import styled from "styled-components";
 import { ChangeEventHandler } from "react";
-import Input from "@mui/material/Input";
 
 interface InputProps {
   id?: string;
@@ -12,39 +12,28 @@ interface InputProps {
   onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   defaultValue?: string;
   onClick?: () => void;
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 }
 
-const StyledInput = styled(Input)({
-  width: "100%",
-  "& .MuiInputBase-root": {
-    padding: "8px 0",
-    fontSize: "16px",
-  },
-  "& .MuiInput-underline": {
-    "&:before": {
-      borderBottom: "1px solid rgb(218, 220, 224)",
-    },
-    "&:hover:not(.Mui-disabled):before": {
-      borderBottom: "1px solid rgba(0, 0, 0, 0.87)",
-    },
-    "&:after": {
-      borderBottom: "2px solid #673ab7",
-    },
-  },
-  "& .MuiInputBase-input": {
-    padding: "8px 0",
-    "&::placeholder": {
-      color: "rgba(0, 0, 0, 0.54)",
-      opacity: 1,
-    },
-  },
-  "&.Mui-focused": {
-    "& .MuiInput-underline:after": {
-      borderBottom: "2px solid #673ab7",
-    },
-  },
-});
+export const StyledInput = styled(Input)`
+  && {
+    .MuiInput-input {
+      font-size: 14px;
+    }
+
+    &.MuiInput-underline:before {
+      border-bottom: 1px solid transparent;
+    }
+
+    &.MuiInput-underline:hover:before {
+      border-bottom: ${({ theme }) => `1px solid ${theme.color.textSub}`};
+    }
+
+    &.MuiInput-underline:after {
+      border-bottom: ${({ theme }) => `2px solid ${theme.color.main}`};
+    }
+  }
+`;
 
 const FormInput = ({
   id,

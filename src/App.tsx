@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "@/styles/globals.css";
 import { ThemeProvider } from "styled-components";
 import { theme } from "@/styles/theme";
+import { StyledEngineProvider } from "@mui/material/styles";
 
 function App() {
   const queryClient = new QueryClient({
@@ -12,12 +13,14 @@ function App() {
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={true} />
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={true} />
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 }
 
